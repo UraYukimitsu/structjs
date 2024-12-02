@@ -1,6 +1,6 @@
-const varPattern = /^(.+) +(#?[a-zA-Z][a-zA-Z0-9_]*?)$/;
-const arrayPattern = /([a-zA-Z][a-zA-Z0-9]*)\[([0-9]+)\]/;
-const bitfield16Pattern = /^(Bitfield[0-9]+)\{(.+)\}$/;
+const varPattern = /^(.+) +(#?[a-zA-Z_][a-zA-Z0-9_]*?)$/;
+const arrayPattern = /([a-zA-Z_][a-zA-Z0-9]*)\[([0-9]+)\]/;
+const bitfieldPattern = /^(Bitfield(?:16|32|64))\{(.+)\}$/;
 
 const primitiveTypes = {
     u8:     { sizeof: 1, read: (data, position) => data.getUint8(position) },
@@ -92,10 +92,14 @@ class Struct {
             if (varType == 'string')
                 throw new Error("Struct members cannot be of type 'string'. Please use a char[] array.");
             let arrayLength = 1;
-            if (bitfield16Pattern.test(varType)) {
+            if (bitfieldPattern.test(varType)) {
                 let bitfieldOptions;
-                [varType, bitfieldOptions] = bitfield16Pattern.exec(varType).slice(1);
-                bitfieldOptions = JSON.parse(`{ ${bitfieldOptions.split(/, */).map(f => f.replace(/^([a-zA-Z][a-zA-Z0-9_]*)/, '"$1"')).join(', ')} }`);
+                [varType, bitfieldOptions] = bitfieldPattern.exec(varType).slice(1);
+                try {
+                    bitfieldOptions = JSON.parse(`{ ${bitfieldOptions.split(/, */).map(f => f.replace(/^(#?[a-zA-Z][a-zA-Z0-9_]*)/, '"$1"')).join(', ')} }`);
+                } catch(e) {
+                    throw new Error(`Malformed bitfield descriptor '${bitfieldOptions}'.`, {cause: e});
+                }
                 this.#props.push({ "type": varType, "name": varName, arrayLength, "options": bitfieldOptions });
                 this.#sizeof += Struct.loadedStructs[varType].sizeof;
                 continue;
