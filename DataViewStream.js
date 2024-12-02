@@ -1,4 +1,4 @@
-const Struct = require('./struct.js');
+const Struct = require('./Struct.js');
 
 /**
  * A stream-like wrapper around DataView for sequential and random-access reading of binary data.
@@ -95,10 +95,11 @@ class DataViewStream {
      * Reads a value of a given type from the current position and advances the read head.
      * @param {string} type - The name of the type or struct to read.
      * @param {boolean} [isLittleEndian=false] - Whether to use little-endian byte order.
+     * @param {object} [options] - Optional parameter to pass to the read function.
      * @returns {*} The parsed value or struct.
      */
-    readNext(type, isLittleEndian = false) {
-        let readValue = Struct.readValue(this.#data, this.#seek_head, type, isLittleEndian);
+    readNext(type, isLittleEndian = false, options) {
+        let readValue = Struct.readValue(this.#data, this.#seek_head, type, isLittleEndian, options);
         this.#seek_head += readValue.count;
         return readValue.value;
     }
@@ -108,15 +109,16 @@ class DataViewStream {
      * @param {number} offset - The position to read from.
      * @param {string} type - The name of the type or struct to read.
      * @param {boolean} [isLittleEndian=false] - Whether to use little-endian byte order.
+     * @param {object} [options] - Optional parameter to pass to the read function.
      * @returns {*} The parsed value or struct.
      * @throws {TypeError} If `offset` is not a number.
      */
-    readAt(offset, type, isLittleEndian = false) {
+    readAt(offset, type, isLittleEndian = false, options) {
         if (typeof offset !== 'number')
             throw new TypeError('Parameter offset should be of type number.');
         else if (Number.isNaN(offset))
             throw new Error('Parameter offset should not be NaN.');
-        let readValue = Struct.readValue(this.#data, offset, type, isLittleEndian);
+        let readValue = Struct.readValue(this.#data, offset, type, isLittleEndian, options);
         return readValue.value;
     }
 
@@ -124,11 +126,12 @@ class DataViewStream {
      * Iterates through the stream, yielding values of the specified type.
      * @param {string} [type='u8'] - The name of the type or struct to read.
      * @param {boolean} [isLittleEndian=false] - Whether to use little-endian byte order.
+     * @param {object} [options] - Optional parameter to pass to the read function.
      * @yields {*} The parsed value or struct.
      */
-    *[Symbol.iterator](type = 'u8', isLittleEndian = false) {
+    *[Symbol.iterator](type = 'u8', isLittleEndian = false, options) {
         while (this.#seek_head < this.#data.byteLength) {
-            yield this.readNext(type, isLittleEndian);
+            yield this.readNext(type, isLittleEndian, options);
         }
     }
 }

@@ -1,4 +1,6 @@
-const arrayPattern = /([a-z][a-z0-9]*)\[([0-9]+)\]/;
+const varPattern = /^(.+) +(#?[a-zA-Z][a-zA-Z0-9_]*?)$/;
+const arrayPattern = /([a-zA-Z][a-zA-Z0-9]*)\[([0-9]+)\]/;
+const bitfield16Pattern = /^(Bitfield[0-9]+)\{(.+)\}$/;
 
 const primitiveTypes = {
     u8:     { sizeof: 1, read: (data, position) => data.getUint8(position) },
@@ -80,13 +82,24 @@ class Struct {
 
         this.#name = structName;
     
-        for(let l in lines) {
+        for(let line of lines) {
+            line = line.trim();
+            if (line.length == 0) continue;
             let varSize = 0;
-            let [varType, varName] = lines[l].split(' ');
+            if (!varPattern.test(line))
+                throw new Error(`Invalid field declaration '${line}'`);
+            let [varType, varName] = varPattern.exec(line).slice(1);
             if (varType == 'string')
                 throw new Error("Struct members cannot be of type 'string'. Please use a char[] array.");
             let arrayLength = 1;
-            if (arrayPattern.test(varType)) {
+            if (bitfield16Pattern.test(varType)) {
+                let bitfieldOptions;
+                [varType, bitfieldOptions] = bitfield16Pattern.exec(varType).slice(1);
+                bitfieldOptions = JSON.parse(`{ ${bitfieldOptions.split(/, */).map(f => f.replace(/^([a-zA-Z][a-zA-Z0-9_]*)/, '"$1"')).join(', ')} }`);
+                this.#props.push({ "type": varType, "name": varName, arrayLength, "options": bitfieldOptions });
+                this.#sizeof += Struct.loadedStructs[varType].sizeof;
+                continue;
+            } else if (arrayPattern.test(varType)) {
                 [varType, arrayLength] = arrayPattern.exec(varType).slice(1);
                 arrayLength = parseInt(arrayLength);
             }
@@ -96,7 +109,7 @@ class Struct {
                 varSize = arrayLength * Struct.loadedStructs[varType].sizeof;
             }
     
-            this.#props.push({ "type": varType, "name": varName, "arrayLength": arrayLength });
+            this.#props.push({ "type": varType, "name": varName, arrayLength });
             this.#sizeof += varSize;
         }
 
@@ -159,13 +172,13 @@ class Struct {
         for (let p in struct.props) {
             let prop = struct.props[p];
             if (prop.arrayLength == 1) {
-                let read = Struct.readValue(data, iter, prop.type, isLittleEndian);
+                let read = Struct.readValue(data, iter, prop.type, isLittleEndian, prop.options);
                 iter += read.count;
                 ret[prop.name] = read.value;
             } else {
                 let value = [];
                 for (let i = 0; i < prop.arrayLength; i++) {
-                    let read = Struct.readValue(data, iter, prop.type, isLittleEndian);
+                    let read = Struct.readValue(data, iter, prop.type, isLittleEndian, prop.options);
                     iter += read.count;
                     value.push(read.value);
                 }
@@ -181,11 +194,12 @@ class Struct {
      * @param {number} position - The offset at which to start reading.
      * @param {string} type - The name of the type or struct to read.
      * @param {boolean} [isLittleEndian=false] - Whether to use little-endian byte order.
+     * @param {object} [options] - Optional parameter to pass to the read function.
      * @returns {{count: number, value: *}} An object containing the size of the value and the parsed value.
      * @throws {Error} If the type is not registered.
      * @throws {TypeError} If `data` is not a DataView.
      */
-    static readValue(data, position, type, isLittleEndian = false) {
+    static readValue(data, position, type, isLittleEndian = false, options) {
         if (!DataView.prototype.isPrototypeOf(data))
             throw new TypeError('Parameter data is not of type DataView.');
     
@@ -198,7 +212,7 @@ class Struct {
             throw new Error(`No struct named '${type}' registered.`);
         }
     
-        ret.value = t.read(data, position, isLittleEndian);
+        ret.value = t.read(data, position, isLittleEndian, options);
         if (type === 'string') {
             ret.count = ret.value.length + 1;
         } else {
@@ -226,26 +240,29 @@ class Struct {
 
         let pos = 0;
         ret += `    static read(data, position, isLittleEndian) {\n`;
+        ret += `        let fromObj = new Object;\n`;
         for (let prop of this.props) {
             if (prop.arrayLength > 1) {
-                ret += `        let ${prop.name} = new Array;\n`;
+                ret += `        fromObj['${prop.name}'] = new Array;\n`;
                 for (let i = 0; i < prop.arrayLength; i++) {
-                    ret += `        ${prop.name}.push(Struct.readValue(data, position + ${pos}, '${prop.type}', isLittleEndian));\n`;
+                    ret += `        fromObj['${prop.name}'].push(Struct.readValue(data, position + ${pos}, '${prop.type}', isLittleEndian, ${JSON.stringify(prop.options)}).value);\n`;
                     pos += Struct.loadedStructs[prop.type].sizeof;
                 }
             } else {
-                ret += `        let ${prop.name} = Struct.readValue(data, position + ${pos}, '${prop.type}', isLittleEndian);\n`;
+                ret += `        fromObj['${prop.name}'] = Struct.readValue(data, position + ${pos}, '${prop.type}', isLittleEndian, ${JSON.stringify(prop.options)}).value;\n`;
                 pos += Struct.loadedStructs[prop.type].sizeof;
             }
         }
         ret += `\n`;
-        ret += `        return new ${this.name}(${this.props.map(prop => prop.name).join(', ')});\n`;
+        ret += `        return new ${this.name}({fromObj});\n`;
         ret += `    }\n\n`;
 
-        ret += `    constructor(${this.props.map(prop => prop.name).join(', ')}) {\n`
+        ret += `    constructor(options) {\n`
+        ret += `        if (typeof options.fromObj === 'object') {\n`;
         for (let prop of this.props) {
-            ret += `        this.${prop.name} = ${prop.name};\n`;
+            ret += `            this.${prop.name} = options.fromObj['${prop.name}'];\n`;
         }
+        ret += `        }\n`
         ret += `    }\n\n`;
 
         ret += `    static {\n`;
