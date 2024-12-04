@@ -20,7 +20,7 @@ class Bitfield {
                     const mask = ((1 << length) - 1) << (this.bitlen() - this.#bitOffsets[name] - length);
                     this.value = (this.value & ~mask) | ((bitValue << (this.bitlen() - this.#bitOffsets[name] - length)) & mask);
                 },
-                enumerable: name.startsWith('#'),
+                enumerable: !name.startsWith('#'),
                 configurable: false,
             });
             currentBit += length;
