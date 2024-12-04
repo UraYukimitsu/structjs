@@ -227,7 +227,7 @@ class Struct {
     }
 
     /**
-     * Converts a registered Struct instance to a JavaScript class.
+     * Statically converts a registered Struct instance to a JavaScript class.
      * @returns The code of a JavaScript class made from the current Struct instance.
      */
     toClass() {
