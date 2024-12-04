@@ -11,6 +11,12 @@ class Bitfield {
         this.value = value;
         this.#fields = fields;
 
+        let length = Object.values(fields).reduce((sum, l) => sum + l);
+        if (typeof length !== 'number' || Number.isNaN(length))
+            throw new TypeError(`Invalid bitfield definition '${JSON.stringify(fields)}'.`);
+        if (length > this.bitlen())
+            throw new Error(`The sum of the fields' bit lengths should not exceed ${this.bitlen()}, got ${length} instead.`);
+
         let currentBit = 0;
         for (const [name, length] of Object.entries(this.#fields)) {
             this.#bitOffsets[name] = currentBit;
