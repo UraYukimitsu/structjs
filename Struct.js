@@ -1,6 +1,6 @@
 const varPattern = /^(.+) +(#?[a-zA-Z_][a-zA-Z0-9_]*?)$/;
 const arrayPattern = /([a-zA-Z_][a-zA-Z0-9]*)\[([0-9]+)\]/;
-const bitfieldPattern = /^(Bitfield(?:16|32|64))\{(.+)\}$/;
+const bitfieldPattern = /^(Bitfield(?:8|16|32|64))\{(.+)\}$/;
 
 const primitiveTypes = {
     u8:     { sizeof: 1, read: (data, position) => data.getUint8(position) },
