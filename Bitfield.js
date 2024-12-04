@@ -31,9 +31,43 @@ class Bitfield {
         let ret = new Object;
         for (const [name, length] of Object.entries(this.#fields)) {
             if (name.startsWith('#')) continue;
-            ret[name] = '0b'+ this[name].toString(2).padStart(length, '0');
+            if (length === 1)
+                ret[name] = Boolean(this[name]);
+            else
+                ret[name] = '0b'+ this[name].toString(2).padStart(length, '0');
         }
         return ret;
+    }
+}
+
+class Bitfield8 extends Bitfield {
+    static get sizeof() { return 1; }
+    bitlen() { return 8; }
+
+    static get name() { return 'Bitfield8'; }
+
+    /**
+     * Reads a 8-bit bitfield from the data view and returns an instance of Bitfield8.
+     * @param {DataView} data - The DataView containing the binary data.
+     * @param {number} position - The position in the DataView where the bitfield starts.
+     * @param {boolean} [isLittleEndian=false] - Indicates if the data is in little-endian format.
+     * @param {object} [options] - Field mapping options for bit names and lengths.
+     * @returns {Bitfield8} - An instance of Bitfield8 with named fields.
+     */
+    static read(data, position, isLittleEndian = false, options = {}) {
+        const rawValue = Struct.readValue(data, position, 'u8', isLittleEndian).value;
+        return new Bitfield8(rawValue, options);
+    }
+
+    /**
+     * Returns the raw bitfield value as a binary string.
+     */
+    toString() {
+        return `0b${this.value.toString(2).padStart(8, '0')}`;
+    }
+
+    static {
+        Struct.registerFromClass(Bitfield8);
     }
 }
 
@@ -130,4 +164,4 @@ class Bitfield64 extends Bitfield {
     }
 }
 
-module.exports = { Bitfield16, Bitfield32, Bitfield64 };
+module.exports = { Bitfield8, Bitfield16, Bitfield32, Bitfield64 };
