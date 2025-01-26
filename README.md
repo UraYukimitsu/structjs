@@ -7,7 +7,7 @@ structjs is a powerful JavaScript library for handling binary data structures, b
 Install the package directly from the repository:
 
 ```bash
-npm install git+https://github.com/UraYukimitsu/structjs
+npm i @urayu/structjs
 ```
 
 ## Features

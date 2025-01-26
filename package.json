@@ -1,5 +1,5 @@
 {
-  "name": "structjs",
+  "name": "@urayu/structjs",
   "version": "1.0.0",
   "description": "StructJS provides an interface to read binary data structures in DataViews",
   "main": "index.js",
