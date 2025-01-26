@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "StructJS provides an interface to read binary data structures in DataViews",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "Ura Yukimitsu",
   "license": "BSD-3-Clause"
 }
