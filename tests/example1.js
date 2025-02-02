@@ -8,7 +8,7 @@ function test() {
         u16 field1
         u8 field2
         Bitfield16{flagA: 1, flagB: 3, fieldC: 4} field3
-    `, 'MyStruct');
+    `, 'Example1');
 
     // Reading the struct from binary data
     const buffer = new ArrayBuffer(16);

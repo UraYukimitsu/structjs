@@ -110,7 +110,7 @@ console.log(bitfield.toString()); // "0b1110101010101010"
         ```
     - `structName` - The unique name of the struct used for registration and future reference.
 
-- `registerFromClass(Class: class)` - Registers a new struct from a JavaScript class.
+- `Struct.registerFromClass(Class: class)` - Registers a new struct from a JavaScript class.
     - `Class` - A JavaScript class with (at least) a static `name` property, a static `sizeof` property, and a static `read` method.
 
 - `Struct.readValue(data: DataView, position: number, type: string[, isLittleEndian: boolean=false, options])` - Reads an instance of a registered struct type from a DataView.
@@ -126,6 +126,30 @@ console.log(bitfield.toString()); // "0b1110101010101010"
     - `position` - The offset at which to start reading.
     - `[isLittleEndian=false]` - Whether to use little-endian byte order.
     - Returns: `Object` An object representing the struct's fields and values.
+
+- `write(data: DataView, position: number, value: Object[, isLittleEndian: boolean = false])` - Writes an instance of the struct to a DataView.
+	 - `data` - The DataView to write to.
+	 - `position` - The offset at which to start writing.
+	 - `value` - The value to write.
+	 - `[isLittleEndian=false]` - Whether to use little-endian byte order.
+     - Returns: `number` - The number of bytes written.
+
+- `Struct.writeStruct(data: DataView, position: number, value: Object, structName: string[, isLittleEndian: boolean = false])` - Writes an instance of the a registered struct type to a DataView.
+     - `data` - The DataView to write to.
+	 - `position` - The offset at which to start writing.
+	 - `value` - The value to write.
+	 - `structName` - The name of the struct to write.
+	 - `[isLittleEndian=false]` - Whether to use little-endian byte order.
+	 - Returns: `number` - The number of bytes written.
+
+- `Struct.writeValue(data: DataView, position: Number, value: any, type: string[, isLittleEndian: boolean = false, options: Object])` - Writes a value of a registered type (primitive or struct) to a DataView.
+	 - `data` - The DataView to write to.
+	 - `position` - The offset at which to start writing.
+	 - `value` - The value to write.
+	 - `type` - The name of the type or struct to write.
+	 - `[isLittleEndian=false]` - Whether to use little-endian byte order.
+	 - `[options]` - Optional parameter to pass to the write function.
+	 - Returns: `number` - The number of bytes written.
 
 - `toClass()` - Statically converts a registered Struct instance to a JavaScript class.
     - Returns: `string` The code of a JavaScript class made from the current Struct instance.
@@ -150,11 +174,26 @@ console.log(bitfield.toString()); // "0b1110101010101010"
     - `[isLittleEndian=false]` - Whether to use little-endian byte order.
     - `[options]` - Optional parameter to pass to the read function.
 
-- `readAt(offset: number, type: string[, isLittleEndian: boolean=false, options])`
+- `readAt(offset: number, type: string[, isLittleEndian: boolean=false, options])` - Reads a value of a given type from a specific position without modifying the read head.
     - `offset` - The position to read from.
     - `type` - The name of the type or struct to read.
     - `[isLittleEndian=false]` - Whether to use little-endian byte order.
     - `[options]` - Optional parameter to pass to the read function.
+
+- `writeNext(value: any, type: string[, isLittleEndian: boolean = false, options: Object])` - Writes a value of a given type at the current position and advances the read/write head.
+	 - `value` - The value to write.
+	 - `type` - The name of the type or struct to write.
+	 - `[isLittleEndian=false]` - Whether to use little-endian byte order.
+	 - `[options]` - Optional parameter to pass to the read function.
+	 - Returns: `number` - The number of bytes written.
+
+- `writeAt(offset: number, value: any, type: string[, isLittleEndian: boolean = false, options: Object])` - Writes a value of a given type at a specific position.
+	 - `offset` - The offset at which to start writing.
+	 - `value` - The value to write.
+	 - `type` - The name of the type or struct to write.
+	 - `[isLittleEndian=false]` - Whether to use little-endian byte order.
+	 - `[options]` - Optional parameter to pass to the read function.
+	 - Returns: `number` - The number of bytes written.
 
 
 ### Bitfield Classes
@@ -174,6 +213,19 @@ console.log(bitfield.toString()); // "0b1110101010101010"
     - `position` - The position in the DataView where the bitfield starts.
     - `[isLittleEndian=false]` - Indicates if the data is in little-endian format.
     - `[options]` - Field mapping options for bit names and lengths.
+
+- `BitField<size>.write(data: DataView, position: number, value: Bitfield<size>[, isLittleEndian: boolean = false])` - Writes a <8|16|32|64>-bit bitfield to the data view.
+	 - `data` - The DataView to write to.
+	 - `position` - The position in the DataView at which to start writing.
+	 - `value` - The value to write.
+	 - `[isLittleEndian=false]` - Indicates if the data is in little-endian format.
+	 - Returns: `number` - The number of bytes written.
+
+- `write(data: DataView, position: number[, isLittleEndian: boolean = false])` - Writes this bitfield to the data view.
+	 - `data` - The DataView to write to.
+	 - `position` - The position in the DataView at which to start writing.
+	 - `[isLittleEndian=false]` - Indicates if the data is in little-endian format.
+	 - Returns: `number` - The number of bytes written.
 
 ## License
 

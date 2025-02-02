@@ -123,6 +123,34 @@ class DataViewStream {
     }
 
     /**
+     * Writes a value of a given type at the current position and advances the read/write head.
+     * @param {*} value - The value to write.
+     * @param {string} type - The name of the type or struct to write.
+     * @param {boolean} [isLittleEndian=false] - Whether to use little-endian byte order.
+     * @param {object} [options] - Optional parameter to pass to the read function.
+     * @returns {number} - The number of bytes written.
+     */
+    writeNext(value, type, isLittleEndian = false, options) {
+        let count = Struct.writeValue(this.#data, this.#seek_head, value, type, isLittleEndian, options);
+        this.#seek_head += count;
+        return count;
+    }
+
+    /**
+     * Writes a value of a given type at a specific position.
+     * @param {number} offset - The offset at which to start writing.
+     * @param {*} value - The value to write.
+     * @param {string} type - The name of the type or struct to write.
+     * @param {boolean} [isLittleEndian=false] - Whether to use little-endian byte order.
+     * @param {object} [options] - Optional parameter to pass to the read function.
+     * @returns {number} - The number of bytes written.
+     */
+    writeAt(offset, value, type, isLittleEndian = false, options) {
+        let count = Struct.writeValue(this.#data, offset, value, type, isLittleEndian, options);
+        return count;
+    }
+
+    /**
      * Iterates through the stream, yielding values of the specified type.
      * @param {string} [type='u8'] - The name of the type or struct to read.
      * @param {boolean} [isLittleEndian=false] - Whether to use little-endian byte order.

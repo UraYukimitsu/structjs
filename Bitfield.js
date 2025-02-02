@@ -66,6 +66,29 @@ class Bitfield8 extends Bitfield {
     }
 
     /**
+     * Writes a 8-bit bitfield to the data view.
+     * @param {DataView} data - The DataView to write to.
+     * @param {number} position - The position in the DataView at which to start writing.
+     * @param {Bitfield8} value - The value to write.
+     * @param {boolean} [isLittleEndian=false] - Indicates if the data is in little-endian format.
+     * @returns {number} - The number of bytes written.
+     */
+    static write(data, position, value, isLittleEndian = false) {
+        return Struct.writeValue(data, position, value.value, 'u8', isLittleEndian).value;;
+    }
+
+    /**
+     * Writes this bitfield to the data view.
+     * @param {DataView} data - The DataView to write to.
+     * @param {number} position - The position in the DataView at which to start writing.
+     * @param {boolean} [isLittleEndian=false] - Indicates if the data is in little-endian format.
+     * @returns {number} - The number of bytes written.
+     */
+    write(data, position, isLittleEndian = false) {
+        return Struct.writeValue(data, position, this.value, 'u8', isLittleEndian).value;;
+    }
+
+    /**
      * Returns the raw bitfield value as a binary string.
      */
     toString() {
@@ -94,6 +117,29 @@ class Bitfield16 extends Bitfield {
     static read(data, position, isLittleEndian = false, options = {}) {
         const rawValue = Struct.readValue(data, position, 'u16', isLittleEndian).value;
         return new Bitfield16(rawValue, options);
+    }
+
+    /**
+     * Writes a 16-bit bitfield to the data view.
+     * @param {DataView} data - The DataView to write to.
+     * @param {number} position - The position in the DataView at which to start writing.
+     * @param {Bitfield16} value - The value to write.
+     * @param {boolean} [isLittleEndian=false] - Indicates if the data is in little-endian format.
+     * @returns {number} - The number of bytes written.
+     */
+    static write(data, position, value, isLittleEndian = false) {
+        return Struct.writeValue(data, position, value.value, 'u16', isLittleEndian).value;;
+    }
+
+    /**
+     * Writes this bitfield to the data view.
+     * @param {DataView} data - The DataView to write to.
+     * @param {number} position - The position in the DataView at which to start writing.
+     * @param {boolean} [isLittleEndian=false] - Indicates if the data is in little-endian format.
+     * @returns {number} - The number of bytes written.
+     */
+    write(data, position, isLittleEndian = false) {
+        return Struct.writeValue(data, position, this.value, 'u16', isLittleEndian).value;;
     }
 
     /**
@@ -128,6 +174,29 @@ class Bitfield32 extends Bitfield {
     }
 
     /**
+     * Writes a 32-bit bitfield to the data view.
+     * @param {DataView} data - The DataView to write to.
+     * @param {number} position - The position in the DataView at which to start writing.
+     * @param {Bitfield32} value - The value to write.
+     * @param {boolean} [isLittleEndian=false] - Indicates if the data is in little-endian format.
+     * @returns {number} - The number of bytes written.
+     */
+    static write(data, position, value, isLittleEndian = false) {
+        return Struct.writeValue(data, position, value.value, 'u32', isLittleEndian).value;;
+    }
+
+    /**
+     * Writes this bitfield to the data view.
+     * @param {DataView} data - The DataView to write to.
+     * @param {number} position - The position in the DataView at which to start writing.
+     * @param {boolean} [isLittleEndian=false] - Indicates if the data is in little-endian format.
+     * @returns {number} - The number of bytes written.
+     */
+    write(data, position, isLittleEndian = false) {
+        return Struct.writeValue(data, position, this.value, 'u32', isLittleEndian).value;;
+    }
+
+    /**
      * Returns the raw bitfield value as a binary string.
      */
     toString() {
@@ -156,6 +225,29 @@ class Bitfield64 extends Bitfield {
     static read(data, position, isLittleEndian = false, options = {}) {
         const rawValue = Struct.readValue(data, position, 'u64', isLittleEndian).value;
         return new Bitfield64(rawValue, options);
+    }
+
+    /**
+     * Writes a 64-bit bitfield to the data view.
+     * @param {DataView} data - The DataView to write to.
+     * @param {number} position - The position in the DataView at which to start writing.
+     * @param {Bitfield64} value - The value to write.
+     * @param {boolean} [isLittleEndian=false] - Indicates if the data is in little-endian format.
+     * @returns {number} - The number of bytes written.
+     */
+    static write(data, position, value, isLittleEndian = false) {
+        return Struct.writeValue(data, position, value.value, 'u64', isLittleEndian).value;;
+    }
+
+    /**
+     * Writes this bitfield to the data view.
+     * @param {DataView} data - The DataView to write to.
+     * @param {number} position - The position in the DataView at which to start writing.
+     * @param {boolean} [isLittleEndian=false] - Indicates if the data is in little-endian format.
+     * @returns {number} - The number of bytes written.
+     */
+    write(data, position, isLittleEndian = false) {
+        return Struct.writeValue(data, position, this.value, 'u64', isLittleEndian).value;;
     }
 
     /**
