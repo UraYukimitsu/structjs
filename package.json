@@ -1,11 +1,19 @@
 {
   "name": "@urayu/structjs",
-  "version": "1.0.0",
-  "description": "StructJS provides an interface to read binary data structures in DataViews",
+  "version": "2.0.0",
+  "description": "StructJS provides an interface to read and write binary data structures in DataViews",
   "main": "index.js",
   "scripts": {
     "test": "node ./tests/run-all.js"
   },
   "author": "Ura Yukimitsu",
+  "homepage": "https://github.com/UraYukimitsu/structjs",
+  "bugs": {
+    "url": "https://github.com/UraYukimitsu/structjs/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:UraYukimitsu/structjs.git"
+  },
   "license": "BSD-3-Clause"
 }
