@@ -22,7 +22,7 @@ npm i @urayu/structjs
 1. Defining and using a `Struct`
 
 ```JS
-const { Struct } = require('structjs');
+const { Struct } = require('@urayu/structjs');
 
 // Define a new struct
 const myStruct = new Struct(`
@@ -56,7 +56,7 @@ console.log(JSON.stringify(parsedStruct, null, 2));
 2. Using `DataViewStream` for sequential reading
 
 ```JS
-const { DataViewStream } = require('structjs');
+const { DataViewStream } = require('@urayu/structjs');
 
 const buffer = new ArrayBuffer(10);
 const stream = new DataViewStream(buffer);
@@ -72,7 +72,7 @@ console.log(stream.tell()); // 3
 3. Using `Bitfield`s
 
 ```JS
-const { Bitfield16 } = require('structjs');
+const { Bitfield16 } = require('@urayu/structjs');
 
 // Define a Bitfield16 with custom fields
 const bitfield = new Bitfield16(0b1010101010101010, { flag1: 1, flag2: 3, data: 12 });
